@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+  xsi:type="MailApp">
+
+  <!-- ======================================================
+       REPLACE THE FOLLOWING PLACEHOLDERS BEFORE DEPLOYING:
+         {{ADDIN_GUID}}   → a newly generated GUID for this add-in
+         {{ADDIN_URL}}    → HTTPS base URL where the add-in is hosted
+         {{CLIENT_ID}}    → Azure Entra ID app registration Client ID
+         {{TENANT_ID}}    → Your Microsoft 365 tenant ID
+       ====================================================== -->
+
+  <Id>{{ADDIN_GUID}}</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Your Organisation</ProviderName>
+  <DefaultLocale>en-GB</DefaultLocale>
+
+  <DisplayName DefaultValue="Leave Visibility"/>
+  <Description DefaultValue="See which colleagues are on leave when reading or composing email, powered by iTrent HR data."/>
+
+  <IconUrl DefaultValue="{{ADDIN_URL}}/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="{{ADDIN_URL}}/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="{{ADDIN_URL}}/support"/>
+
+  <AppDomains>
+    <AppDomain>{{ADDIN_URL}}</AppDomain>
+    <!-- Add any additional domains your API backend uses -->
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+
+  <Requirements>
+    <Sets DefaultMinVersion="1.7">
+      <Set Name="Mailbox" MinVersion="1.7"/>
+    </Sets>
+  </Requirements>
+
+  <!-- Legacy FormSettings required by manifest schema -->
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="{{ADDIN_URL}}/taskpane/taskpane.html"/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+
+  <Permissions>ReadWriteItem</Permissions>
+
+  <!-- Activation rule: activate for all mail items -->
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
+  </Rule>
+
+  <!-- VersionOverrides: modern command surface integration -->
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+
+    <!-- SSO / WebApplicationInfo — ties add-in to the Entra ID app registration -->
+    <WebApplicationInfo>
+      <Id>{{CLIENT_ID}}</Id>
+      <Resource>api://{{ADDIN_URL}}/{{CLIENT_ID}}</Resource>
+      <Scopes>
+        <Scope>openid</Scope>
+        <Scope>profile</Scope>
+        <Scope>email</Scope>
+        <Scope>User.Read</Scope>
+        <Scope>offline_access</Scope>
+      </Scopes>
+    </WebApplicationInfo>
+
+    <Requirements>
+      <Sets DefaultMinVersion="1.7">
+        <Set Name="Mailbox" MinVersion="1.7"/>
+      </Sets>
+    </Requirements>
+
+    <Hosts>
+
+      <!-- ── Outlook Desktop / Outlook on the web ─────────────── -->
+      <Host xsi:type="MailHost">
+        <DesktopFormFactor>
+
+          <!-- Function file for event-based commands -->
+          <FunctionFile resid="Commands.Url"/>
+
+          <!-- ── Message Read: ribbon button + auto-open taskpane ── -->
+          <ExtensionPoint xsi:type="MessageReadCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="msgReadGroup">
+                <Label resid="GroupLabel"/>
+                <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                  <Label resid="TaskpaneButton.Label"/>
+                  <Supertip>
+                    <Title resid="TaskpaneButton.Label"/>
+                    <Description resid="TaskpaneButton.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>ButtonId1</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                    <SupportsPinning>true</SupportsPinning>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+
+          <!-- ── Message Compose: ribbon button ─────────────────── -->
+          <ExtensionPoint xsi:type="MessageComposeCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="msgComposeGroup">
+                <Label resid="GroupLabel"/>
+                <Control xsi:type="Button" id="msgComposeOpenPaneButton">
+                  <Label resid="TaskpaneButton.Label"/>
+                  <Supertip>
+                    <Title resid="TaskpaneButton.Label"/>
+                    <Description resid="TaskpaneButton.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>ButtonId2</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                    <SupportsPinning>true</SupportsPinning>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+
+        </DesktopFormFactor>
+      </Host>
+
+    </Hosts>
+
+    <!-- Resource definitions -->
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16x16" DefaultValue="{{ADDIN_URL}}/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="{{ADDIN_URL}}/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="{{ADDIN_URL}}/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="{{ADDIN_URL}}/commands/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="{{ADDIN_URL}}/taskpane/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GroupLabel" DefaultValue="Leave Visibility"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Leave Status"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Check which email recipients are currently on leave (powered by iTrent)"/>
+      </bt:LongStrings>
+    </Resources>
+
+  </VersionOverrides>
+
+</OfficeApp>

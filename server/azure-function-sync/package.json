@@ -1,0 +1,22 @@
+{
+  "name": "m365-leave-visibility-sync-function",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Azure Function: scheduled iTrent leave data sync",
+  "main": "dist/iTrentSync/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "func start"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.1.1",
+    "@azure/functions": "^3.5.1",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "m365-leave-visibility-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend API for M365 Leave Visibility add-in",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.1.1",
+    "@azure/msal-node": "^2.16.2",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jwks-rsa": "^3.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "node-soap": "^1.1.10",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.0.0",
+    "@types/node-cron": "^3.0.11",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.2"
+  }
+}

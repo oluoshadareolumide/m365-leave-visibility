@@ -1,0 +1,44 @@
+{
+  "name": "m365-leave-visibility",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Outlook add-in for M365 tenant-wide employee leave visibility, integrated with iTrent HR",
+  "scripts": {
+    "start": "webpack serve --config webpack.config.js",
+    "build": "webpack --config webpack.config.js",
+    "build:server": "npm --prefix server run build",
+    "build:all": "npm run build && npm run build:server",
+    "dev:server": "npm --prefix server run dev",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "test": "jest --passWithNoTests",
+    "validate-manifest": "office-addin-manifest validate manifest.xml"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^3.28.1",
+    "@fluentui/react-components": "^9.54.8",
+    "@fluentui/react-icons": "^2.0.264",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/office-js": "^1.0.463",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.0.0",
+    "html-webpack-plugin": "^5.6.3",
+    "jest": "^29.7.0",
+    "office-addin-dev-certs": "^1.12.0",
+    "office-addin-manifest": "^1.9.0",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.2",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  }
+}
