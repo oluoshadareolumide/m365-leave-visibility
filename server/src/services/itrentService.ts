@@ -7,10 +7,10 @@
  * Configuration is driven by the ITRENT_* environment variables in .env.
  */
 
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { config } from '../config';
 import { logger } from '../logger';
-import type { iTrentEmployee, iTrentAbsence, LeaveRecord } from '../../../src/shared/types';
+import type { iTrentEmployee, iTrentAbsence, LeaveRecord } from '../shared/types';
 
 interface ODataListResponse<T> {
   '@odata.context'?: string;
@@ -83,9 +83,10 @@ async function fetchAllPages<T>(
   let nextUrl: string | null = url;
 
   while (nextUrl) {
-    const res = await client.get<ODataListResponse<T>>(nextUrl, {
-      params: nextUrl === url ? params : undefined,
-    });
+    const res: AxiosResponse<ODataListResponse<T>> = await client.get<ODataListResponse<T>>(
+      nextUrl,
+      { params: nextUrl === url ? params : undefined }
+    );
     results.push(...res.data.value);
     nextUrl = res.data['@odata.nextLink'] ?? null;
   }

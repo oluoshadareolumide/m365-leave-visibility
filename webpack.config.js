@@ -74,6 +74,7 @@ module.exports = {
           __TENANT_ID__: JSON.stringify(AZURE_TENANT_ID),
           __ADDIN_URL__: JSON.stringify(ADDIN_URL),
           __API_BASE_URL__: JSON.stringify(API_BASE_URL),
+          __DEV_MODE__: JSON.stringify(isDev || process.env.DEV_MODE === 'true'),
         }).apply(compiler);
       },
     },

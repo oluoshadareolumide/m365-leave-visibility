@@ -1,7 +1,8 @@
 import cron from 'node-cron';
-import { syncFromITrent } from './itrentService';
+import { syncFromITrent, SyncResult } from './itrentService';
 import { leaveCache } from '../data/leaveCache';
-import { processLeaveNotificationsForToday, processAdvanceNotifications } from './notificationService';
+import { getMockLeaveRecords } from '../data/mockData';
+import { processLeaveNotificationsForToday } from './notificationService';
 import { config } from '../config';
 import { logger } from '../logger';
 
@@ -17,8 +18,17 @@ export async function runSync(): Promise<void> {
   const startTime = Date.now();
 
   try {
-    logger.info('Starting iTrent data sync...');
-    const result = await syncFromITrent();
+    let result: SyncResult;
+
+    if (config.devMode && !config.itrent.baseUrl) {
+      // Local development: serve mock data instead of calling iTrent.
+      const records = getMockLeaveRecords();
+      logger.warn(`DEV MODE: seeding ${records.length} mock leave records (iTrent not configured)`);
+      result = { records, employeeCount: records.length, absenceCount: records.length };
+    } else {
+      logger.info('Starting iTrent data sync...');
+      result = await syncFromITrent();
+    }
 
     leaveCache.setAll(result.records);
     leaveCache.updateSyncStatus({
@@ -34,9 +44,10 @@ export async function runSync(): Promise<void> {
       `${result.records.length} active/upcoming leave records`
     );
 
-    // Process notifications after sync
-    await processLeaveNotificationsForToday();
-
+    // Teams presence / OOF notifications require real Graph credentials.
+    if (!config.devMode) {
+      await processLeaveNotificationsForToday();
+    }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     logger.error(`Sync failed: ${message}`);

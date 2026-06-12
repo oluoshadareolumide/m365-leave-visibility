@@ -80,6 +80,9 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 const server = app.listen(config.port, () => {
   logger.info(`Leave Visibility API running on port ${config.port} (${config.nodeEnv})`);
+  if (config.devMode) {
+    logger.warn('DEV MODE ENABLED — auth is bypassed and mock data is served. Never use in production.');
+  }
   startSyncScheduler();
 });
 

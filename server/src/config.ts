@@ -13,15 +13,28 @@ function optional(key: string, fallback = ''): string {
   return process.env[key] ?? fallback;
 }
 
+// DEV_MODE is an explicit opt-in. When enabled the server boots without real
+// Azure/iTrent credentials, serves mock leave data, and bypasses SSO so the
+// add-in can be tested locally. It must never be set in production.
+const isDevMode = optional('DEV_MODE', 'false') === 'true';
+
+// In dev mode, secrets become optional with throwaway fallbacks so the server
+// can start. In production these remain hard requirements.
+function requiredUnlessDev(key: string, devFallback: string): string {
+  if (isDevMode) return optional(key, devFallback);
+  return required(key);
+}
+
 export const config = {
   port: parseInt(optional('PORT', '3001'), 10),
   nodeEnv: optional('NODE_ENV', 'development'),
   isDev: optional('NODE_ENV', 'development') !== 'production',
+  devMode: isDevMode,
 
   azure: {
-    tenantId: required('AZURE_TENANT_ID'),
-    clientId: required('AZURE_CLIENT_ID'),
-    clientSecret: required('AZURE_CLIENT_SECRET'),
+    tenantId: requiredUnlessDev('AZURE_TENANT_ID', 'dev-tenant'),
+    clientId: requiredUnlessDev('AZURE_CLIENT_ID', 'dev-client'),
+    clientSecret: requiredUnlessDev('AZURE_CLIENT_SECRET', 'dev-secret'),
     addinUrl: optional('ADDIN_URL', 'https://localhost:3000'),
   },
 

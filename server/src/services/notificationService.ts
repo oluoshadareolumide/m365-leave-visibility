@@ -11,7 +11,7 @@ import { leaveCache } from '../data/leaveCache';
 import { getUserByEmail, setUserPresenceStatusMessage, setOofSettings, sendTeamsNotification } from './graphService';
 import { config } from '../config';
 import { logger } from '../logger';
-import type { LeaveRecord } from '../../../src/shared/types';
+import type { LeaveRecord } from '../shared/types';
 
 function isToday(dateStr: string): boolean {
   const date = new Date(dateStr);

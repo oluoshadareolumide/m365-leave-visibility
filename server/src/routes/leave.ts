@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { getLeaveStatusForEmails } from '../services/leaveStatusService';
-import type { LeaveStatusResponse } from '../../../src/shared/types';
+import type { LeaveStatusResponse } from '../shared/types';
 
 const router = Router();
 

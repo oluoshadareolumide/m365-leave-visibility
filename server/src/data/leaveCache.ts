@@ -1,4 +1,4 @@
-import type { LeaveRecord, SyncStatus } from '../../../src/shared/types';
+import type { LeaveRecord, SyncStatus } from '../shared/types';
 
 const CACHE_TTL_MS = 35 * 60 * 1000; // 35 min (slightly longer than sync interval)
 

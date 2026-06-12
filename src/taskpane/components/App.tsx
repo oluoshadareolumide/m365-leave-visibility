@@ -7,6 +7,7 @@ import { Settings, loadSettings } from './Settings';
 /* global Office */
 
 declare const __API_BASE_URL__: string;
+declare const __DEV_MODE__: boolean;
 
 type View = 'main' | 'settings';
 
@@ -22,6 +23,10 @@ interface State {
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 async function getOfficeToken(): Promise<string> {
+  // In dev builds, SSO is bypassed — the backend accepts this token directly.
+  if (typeof __DEV_MODE__ !== 'undefined' && __DEV_MODE__) {
+    return 'dev-token';
+  }
   return new Promise((resolve, reject) => {
     Office.auth
       .getAccessToken({ allowSignInPrompt: true, allowConsentPrompt: true })

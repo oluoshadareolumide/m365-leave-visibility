@@ -43,6 +43,17 @@ export function requireAuth(
 
   const token = authHeader.slice(7);
 
+  // Local development bypass. Only active when DEV_MODE=true is explicitly set,
+  // so it can never weaken auth in a production deployment.
+  if (config.devMode) {
+    req.userId = 'dev-user';
+    req.userEmail = 'dev.user@contoso.com';
+    req.tenantId = 'dev-tenant';
+    req.accessToken = token;
+    next();
+    return;
+  }
+
   jwt.verify(
     token,
     getKey,

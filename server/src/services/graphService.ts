@@ -12,7 +12,7 @@ import axios from 'axios';
 import { Client, ResponseType } from '@microsoft/microsoft-graph-client';
 import { config } from '../config';
 import { logger } from '../logger';
-import type { GraphUser, GraphPresenceUpdate } from '../../../src/shared/types';
+import type { GraphUser, GraphPresenceUpdate } from '../shared/types';
 import 'isomorphic-fetch';
 
 // ─── OBO Token Exchange ───────────────────────────────────────────────────────

@@ -8,12 +8,13 @@
 import { leaveCache } from '../data/leaveCache';
 import { fetchLeaveForEmails } from './itrentService';
 import { getUsersByEmails } from './graphService';
+import { config } from '../config';
 import { logger } from '../logger';
 import type {
   EmployeeLeaveStatus,
   EmployeeLeaveStatusType,
   LeaveRecord,
-} from '../../../src/shared/types';
+} from '../shared/types';
 
 const RETURNING_SOON_DAYS = 2;
 const UPCOMING_DAYS = 7;
@@ -68,11 +69,13 @@ export async function getLeaveStatusForEmails(
   const now = new Date();
 
   // Try cache first
-  let recordsByEmail = leaveCache.getByEmails(uniqueEmails);
-  const uncached = uniqueEmails.filter((e) => !leaveCache.isFresh() || recordsByEmail.get(e) === undefined);
+  const recordsByEmail = leaveCache.getByEmails(uniqueEmails);
+  const uncached = uniqueEmails.filter(
+    (e) => !leaveCache.isFresh() || recordsByEmail.get(e) === undefined
+  );
 
-  // Live fallback for uncached/stale emails
-  if (uncached.length > 0) {
+  // Live fallback for uncached/stale emails (skipped in dev — no iTrent)
+  if (uncached.length > 0 && !config.devMode) {
     try {
       const liveRecords = await fetchLeaveForEmails(uncached);
       for (const record of liveRecords) {
@@ -86,15 +89,17 @@ export async function getLeaveStatusForEmails(
     }
   }
 
-  // Resolve display names from Graph for any emails we have no displayName for
+  // Resolve display names from Graph for any emails we have no displayName for.
+  // Skipped in dev mode (no Graph credentials) — falls back to the raw email.
   const emailsMissingDisplayName = uniqueEmails.filter((e) => {
     const records = recordsByEmail.get(e) ?? [];
     return records.length === 0 || !records[0].displayName;
   });
 
-  const graphUsers = emailsMissingDisplayName.length > 0
-    ? await getUsersByEmails(emailsMissingDisplayName)
-    : new Map();
+  const graphUsers =
+    !config.devMode && emailsMissingDisplayName.length > 0
+      ? await getUsersByEmails(emailsMissingDisplayName)
+      : new Map();
 
   return uniqueEmails.map((email) => {
     const records = recordsByEmail.get(email) ?? [];
