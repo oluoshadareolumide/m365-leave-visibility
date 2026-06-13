@@ -1,0 +1,30 @@
+# OPTIONAL alternative for dependency updates only.
+#
+# Dependabot is the most reliable way to keep dependencies fresh, but its
+# commits/PRs are authored by "dependabot[bot]" — NOT you. If sole authorship
+# matters, prefer the deps task in maintain.py instead. If you just want safe,
+# reliable dependency PRs that you then merge yourself, drop this file at
+# .github/dependabot.yml in each repo (adjust ecosystems to match the repo).
+
+version: 2
+updates:
+  - package-ecosystem: "npm"          # JS / TS repos
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: "pip"          # Python repos
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"        # C# repos
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"  # keep workflow actions current
+    directory: "/"
+    schedule:
+      interval: "weekly"

@@ -1,0 +1,28 @@
+{
+  "author": {
+    "name": "Turf",
+    "email": "oluoshadare.olumide@gmail.com"
+  },
+
+  "include": [],
+  "exclude": [],
+
+  "skip_forks": true,
+  "skip_archived": true,
+  "skip_private": false,
+
+  "tasks": {
+    "license_year": true,
+    "format": true,
+    "deps": false
+  },
+
+  "deps": {
+    "npm_target": "minor",
+    "require_passing_tests": true
+  },
+
+  "commit": {
+    "message": "chore: automated maintenance"
+  }
+}
