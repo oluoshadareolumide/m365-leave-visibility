@@ -213,6 +213,14 @@ def _has_unstaged_changes(repo_dir: Path) -> bool:
     return bool(res.stdout.strip())
 
 
+def _is_empty_repo(repo_dir: Path) -> bool:
+    """True if the clone has no commits (e.g. a repo created but never pushed
+    to). Such repos have no default-branch ref, so there is nothing to
+    maintain — we skip them rather than letting them fail the whole run."""
+    res = run(["git", "rev-parse", "--verify", "HEAD"], cwd=repo_dir, check=False)
+    return res.returncode != 0
+
+
 # --------------------------------------------------------------------------- #
 # Per-repo processing
 # --------------------------------------------------------------------------- #
@@ -253,8 +261,16 @@ def process_repo(repo: dict, cfg: dict, token: str, dry_run: bool) -> str:
     repo_dir = tmp / name
     try:
         clone_url = f"https://x-access-token:{token}@github.com/{repo['full_name']}.git"
-        run(["git", "clone", "--depth", "1", "--branch", branch,
-             clone_url, str(repo_dir)], env=env)
+        # Shallow-clone the default branch. We deliberately do NOT pass
+        # --branch: an empty repo still reports a default_branch via the API
+        # but has no ref to fetch, so `git clone --branch main` fails hard with
+        # "Remote branch main not found". A plain shallow clone uses the remote
+        # HEAD instead, succeeding (empty checkout for empty repos), which we
+        # then skip below — so one empty repo no longer fails the whole run.
+        run(["git", "clone", "--depth", "1", clone_url, str(repo_dir)], env=env)
+
+        if _is_empty_repo(repo_dir):
+            return f"  - {name}: empty, skipped"
 
         tasks = cfg.get("tasks", {})
         applied: list[str] = []
