@@ -9,8 +9,10 @@ name: account-maintenance
 
 on:
   schedule:
-    # Weekly, Mondays 06:17 UTC. Tune as you like; cron uses UTC.
-    - cron: "17 6 * * 1"
+    # Daily at 06:17 UTC — keeps the threat-intel feeds fresh (they change most
+    # days, so this is where the steady activity comes from). Heavier tasks like
+    # deps simply no-op on days with nothing to do. cron uses UTC; tune freely.
+    - cron: "17 6 * * *"
   workflow_dispatch:
     # Manual "Run workflow" button — use this with dry-run first.
     inputs:
