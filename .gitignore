@@ -7,6 +7,8 @@ npm-debug.log*
 coverage/
 .nyc_output/
 .cache/
+__pycache__/
+*.pyc
 *.js.map
 # Emitted JS/declarations must never leak into the TS-only source tree
 src/**/*.js
