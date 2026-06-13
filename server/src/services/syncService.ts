@@ -20,10 +20,11 @@ export async function runSync(): Promise<void> {
   try {
     let result: SyncResult;
 
-    if (config.devMode && !config.itrent.baseUrl) {
-      // Local development: serve mock data instead of calling iTrent.
+    if (config.devMode) {
+      // Local development: always serve mock data, never call iTrent. This keeps
+      // dev mode working even if ITRENT_* placeholders are left in .env.
       const records = getMockLeaveRecords();
-      logger.warn(`DEV MODE: seeding ${records.length} mock leave records (iTrent not configured)`);
+      logger.warn(`DEV MODE: seeding ${records.length} mock leave records`);
       result = { records, employeeCount: records.length, absenceCount: records.length };
     } else {
       logger.info('Starting iTrent data sync...');
