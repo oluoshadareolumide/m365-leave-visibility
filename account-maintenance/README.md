@@ -42,34 +42,57 @@ deploy it once. The commit author/committer are set to you
   IOC feeds and commits the data is valuable *and* naturally daily. Ask me to
   add a feed-pull task and I'll wire it in.
 
-## Activate (3 steps)
+## Activate
 
-1. **Create a token** with write access to your repos:
-   - Recommended: a **fine-grained PAT** → Settings → Developer settings →
-     Fine-grained tokens. Resource owner: you. Repository access: *All
-     repositories*. Permissions: **Contents: Read and write** (add
-     **Workflows: Read and write** only if you want it to touch workflow
-     files). Set an expiry and calendar a rotation.
-   - Or a classic PAT with the `repo` scope.
-2. **Add it as a secret** named `GH_MAINTENANCE_TOKEN` on your host repo
-   (Settings → Secrets and variables → Actions → New repository secret).
-3. **Install the workflow**: copy `account-maintenance/account-maintenance.yml`
-   to `.github/workflows/account-maintenance.yml` on the host repo's
-   **default branch**, and make sure the `account-maintenance/` folder lives
-   at that repo's root.
-   > Note: `m365-leave-visibility`'s current default branch is a `claude/*`
-   > branch. Scheduled workflows run **only from the default branch**, so set a
-   > sensible default (e.g. `main`) or host this kit elsewhere — `it-support-scripts`
-   > is a natural home.
+There is exactly **one** thing only you can do — mint the token (it's a
+credential tied to your GitHub login; no script or assistant can create it for
+you). Everything after that is a single command.
 
-**Test before trusting it:** run it manually first — Actions tab → run
-`account-maintenance` with *Dry run* checked. It prints what it *would* commit
-without changing anything. When happy, run it un-checked or wait for the cron.
+### Step 1 — create the token (only you)
 
-You can also dry-run locally:
+- Recommended: a **fine-grained PAT** → Settings → Developer settings →
+  Fine-grained tokens. Resource owner: you. Repository access: *All
+  repositories*. Permissions: **Contents: Read and write** (add **Workflows:
+  Read and write** only if you want it to touch workflow files). Set an expiry
+  and calendar a rotation.
+- Or a classic PAT with the `repo` scope.
+
+> Never paste this token into a chat. Keep it in your shell/secret store only.
+
+### Step 2 — one command (does everything else)
+
+With the GitHub CLI (`gh`) logged in, from a checkout of this kit:
 
 ```bash
-export GH_MAINTENANCE_TOKEN=ghp_xxx
+export GH_MAINTENANCE_TOKEN=github_pat_xxx   # the token from step 1
+./bootstrap.sh                               # default host repo: it-support-scripts
+# or target a different host:  ./bootstrap.sh some-repo
+```
+
+`bootstrap.sh` installs the scheduler on the host repo's default branch, stores
+the token as the `GH_MAINTENANCE_TOKEN` secret, and kicks off a **dry run** so
+you can review before anything is ever committed. Watch it:
+`gh run watch --repo <you>/it-support-scripts`. When happy, run it without
+dry-run or just let the weekly cron take over — it maintains **all** your repos
+from that one place.
+
+### Manual alternative (no script)
+
+1. Add the token as an Actions secret named `GH_MAINTENANCE_TOKEN` on the host repo
+   (Settings → Secrets and variables → Actions → New repository secret).
+2. Copy `account-maintenance.yml` → `.github/workflows/account-maintenance.yml`
+   on the host repo's **default branch**, with `account-maintenance/` at its root.
+3. Actions tab → run `account-maintenance` with *Dry run* checked.
+
+> Scheduled workflows run **only from a repo's default branch**. Pick a host
+> whose default is sensible — `it-support-scripts` (default `main`) is a natural
+> home. `m365-leave-visibility` currently defaults to a `claude/*` branch, so it
+> is *not* a good host as-is.
+
+You can also dry-run locally before deploying anywhere:
+
+```bash
+export GH_MAINTENANCE_TOKEN=github_pat_xxx
 python account-maintenance/maintain.py --dry-run
 python account-maintenance/maintain.py --dry-run --only CleanCSV,xgta-soc
 ```
