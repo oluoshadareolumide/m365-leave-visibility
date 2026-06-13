@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const isDev = process.env.NODE_ENV !== 'production';
+const isDevMode = isDev || process.env.DEV_MODE === 'true';
 const ADDIN_URL = process.env.ADDIN_URL || 'https://localhost:3000';
 const API_BASE_URL = process.env.API_BASE_URL || 'https://localhost:3001';
 const AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID || '';
@@ -54,6 +55,9 @@ module.exports = {
       filename: 'taskpane/taskpane.html',
       template: './src/taskpane/index.html',
       chunks: ['taskpane'],
+      // In dev builds, skip the office.js CDN script so the mock Office runtime
+      // (devMockOffice.ts) isn't clobbered when running in a plain browser.
+      templateParameters: { loadOfficeJs: !isDevMode },
     }),
     new HtmlWebpackPlugin({
       filename: 'commands/commands.html',
@@ -74,7 +78,7 @@ module.exports = {
           __TENANT_ID__: JSON.stringify(AZURE_TENANT_ID),
           __ADDIN_URL__: JSON.stringify(ADDIN_URL),
           __API_BASE_URL__: JSON.stringify(API_BASE_URL),
-          __DEV_MODE__: JSON.stringify(isDev || process.env.DEV_MODE === 'true'),
+          __DEV_MODE__: JSON.stringify(isDevMode),
         }).apply(compiler);
       },
     },

@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <title>Leave Visibility</title>
-    <!-- Office.js must be loaded from the CDN, not bundled -->
+    <!-- Office.js must be loaded from the CDN, not bundled. Skipped in dev
+         builds (loadOfficeJs=false) so it doesn't overwrite the mock Office
+         runtime when the taskpane runs in a plain browser. -->
+    <% if (loadOfficeJs) { %>
     <script
       type="text/javascript"
       src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"
     ></script>
+    <% } %>
   </head>
   <body>
     <div id="root"></div>
