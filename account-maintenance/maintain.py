@@ -78,6 +78,15 @@ def gh_get(path: str, token: str) -> list | dict:
         return json.loads(resp.read().decode())
 
 
+def http_get_bytes(url: str, timeout: int = 30) -> bytes:
+    """Fetch a URL's raw bytes (used for public threat-intel / IOC feeds)."""
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "account-maintenance-threatfeed"}
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return resp.read()
+
+
 def list_owned_repos(token: str) -> list[dict]:
     """Every repo the authenticated user owns (public + private)."""
     repos: list[dict] = []
@@ -221,6 +230,49 @@ def _is_empty_repo(repo_dir: Path) -> bool:
     return res.returncode != 0
 
 
+def _ioc_payload(raw: bytes) -> bytes:
+    """The substantive content of a feed: non-comment, non-blank lines, sorted.
+    Used only to decide whether anything *meaningful* changed before committing,
+    so a feed that merely re-stamps its own header never yields a hollow commit."""
+    lines = [
+        s for s in (l.strip() for l in raw.decode("utf-8", "ignore").splitlines())
+        if s and s[0] not in "#;"
+    ]
+    return "\n".join(sorted(lines)).encode()
+
+
+def task_threat_feeds(repo_dir: Path, repo_name: str, cfg: dict) -> bool:
+    """For configured security repos only: mirror public threat-intel / IOC
+    feeds into a local archive directory and commit when the indicators change.
+
+    Honest by construction: it writes the feed verbatim but decides whether to
+    commit by comparing only the actual indicators (see `_ioc_payload`). Public
+    blocklists change ~daily, so this is genuine recurring work, not filler.
+    A feed that is unreachable is skipped, never fatal."""
+    fcfg = cfg.get("feeds", {})
+    if repo_name not in set(fcfg.get("repos", [])):
+        return False
+    sources = fcfg.get("sources", {})
+    if not sources:
+        return False
+
+    out_dir = repo_dir / fcfg.get("dir", "threat-intel/feeds")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    wrote = False
+    for fname, url in sources.items():
+        try:
+            data = http_get_bytes(url)
+        except (urllib.error.URLError, OSError) as exc:
+            log(f"      feed {fname}: fetch failed ({exc}); skipping")
+            continue
+        target = out_dir / fname
+        old = target.read_bytes() if target.is_file() else b""
+        if _ioc_payload(data) != _ioc_payload(old):
+            target.write_bytes(data)
+            wrote = True
+    return wrote and _has_unstaged_changes(repo_dir)
+
+
 # --------------------------------------------------------------------------- #
 # Per-repo processing
 # --------------------------------------------------------------------------- #
@@ -280,6 +332,9 @@ def process_repo(repo: dict, cfg: dict, token: str, dry_run: bool) -> str:
             applied.append("format")
         if tasks.get("deps", False) and task_deps(repo_dir, cfg.get("deps", {})):
             applied.append("deps")
+        if tasks.get("threat_feeds", False) and task_threat_feeds(
+                repo_dir, name, cfg):
+            applied.append("threat-feeds")
 
         if not _has_unstaged_changes(repo_dir):
             return f"  - {name}: no changes"

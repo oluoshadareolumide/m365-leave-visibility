@@ -39,8 +39,9 @@ deploy it once. The commit author/committer are set to you
 - **Want genuinely frequent, honest commits?** Point this at *real* recurring
   work. Your security repos (`xgta-soc`, `SOC-Threat-Intelligence-`,
   `PhishingGuard`) are ideal: a scheduled task that pulls fresh threat-intel /
-  IOC feeds and commits the data is valuable *and* naturally daily. Ask me to
-  add a feed-pull task and I'll wire it in.
+  IOC feeds and commits the data is valuable *and* naturally daily. This is now
+  wired in as the `threat_feeds` task and enabled for those repos by default —
+  it commits only when the actual indicators change, so it never churns.
 
 ## Activate
 
@@ -112,6 +113,10 @@ python account-maintenance/maintain.py --dry-run --only CleanCSV,xgta-soc
 | `tasks.deps` | **Opt-in.** Bump dependencies. |
 | `deps.npm_target` | `patch` \| `minor` \| `latest` (default `minor` — avoids breaking majors). |
 | `deps.require_passing_tests` | If the repo has an npm `test` script, run it after bumping and revert if it fails (default `true`). |
+| `tasks.threat_feeds` | Mirror public IOC/threat-intel feeds into security repos (see `feeds`). Commits only when indicators change. |
+| `feeds.repos` | Repo names that receive the feed archive (default: your SOC/security repos). |
+| `feeds.dir` | Where feeds are written in each target repo (default `threat-intel/feeds`). |
+| `feeds.sources` | Map of `filename → feed URL`. Unreachable feeds are skipped, never fatal. |
 | `commit.message` | Commit subject line. |
 
 ## Tasks, by risk
@@ -121,6 +126,7 @@ python account-maintenance/maintain.py --dry-run --only CleanCSV,xgta-soc
 | `license_year` | very low | the year changed |
 | `format` | low | the repo's own formatter finds drift |
 | `deps` | medium (opt-in) | a dependency has a newer (minor/patch) version *and* tests still pass |
+| `threat_feeds` | low | a mirrored feed's actual indicators change (security repos only) |
 
 ## Security notes
 

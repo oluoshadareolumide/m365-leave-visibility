@@ -14,12 +14,25 @@
   "tasks": {
     "license_year": true,
     "format": true,
-    "deps": false
+    "deps": true,
+    "threat_feeds": true
   },
 
   "deps": {
     "npm_target": "minor",
     "require_passing_tests": true
+  },
+
+  "feeds": {
+    "dir": "threat-intel/feeds",
+    "repos": ["xgta-soc", "PhishingGuard", "SOC-Threat-Intelligence-"],
+    "sources": {
+      "emergingthreats-compromised-ips.txt": "https://rules.emergingthreats.net/blockrules/compromised-ips.txt",
+      "cins-ci-badguys.txt": "https://cinsscore.com/list/ci-badguys.txt",
+      "blocklist-de-all.txt": "https://lists.blocklist.de/lists/all.txt",
+      "greensnow.txt": "https://blocklist.greensnow.co/greensnow.txt",
+      "tor-exit-nodes.txt": "https://check.torproject.org/torbulkexitlist"
+    }
   },
 
   "commit": {
