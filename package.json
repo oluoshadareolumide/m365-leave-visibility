@@ -10,7 +10,7 @@
     "build:all": "npm run build && npm run build:server",
     "dev:server": "npm --prefix server run dev",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "test": "jest --passWithNoTests",
+    "test": "jest --passWithNoTests && npm --prefix server test",
     "validate-manifest": "office-addin-manifest validate manifest.xml"
   },
   "dependencies": {

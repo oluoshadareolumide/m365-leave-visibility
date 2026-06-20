@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <meta name="description" content="Hakim Group IT Support Portal — log an IT issue for your practice." />
+  <meta name="robots" content="noindex" />
+  <title>IT Support Portal · Hakim Group</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<!-- data-api-base: leave empty for same-origin; set to the API URL if the
+     portal is hosted separately from the backend. -->
+<body data-api-base="">
+  <a class="hg-skip" href="#main">Skip to form</a>
+
+  <header class="hg-topbar">
+    <div class="hg-container hg-topbar-inner">
+      <img class="hg-logo" src="assets/logo.svg" width="280" height="56"
+           alt="Hakim Group — IT Support Portal" />
+      <a class="hg-topbar-link" id="support-email-link" href="#">Contact IT Support</a>
+    </div>
+  </header>
+
+  <main id="main" class="hg-container hg-main">
+    <div class="hg-card hg-intro">
+      <h1>How can we help your practice today?</h1>
+      <p>
+        Use this form to report an IT issue. Tell us what's happening and how
+        urgent it is, and we'll route your request to the right place straight
+        away. Fields marked <span class="hg-req-key">*</span> are required.
+      </p>
+    </div>
+
+    <!-- ───────────────────────── Support form ───────────────────────── -->
+    <form id="ticket-form" class="hg-card hg-form" novalidate>
+      <!-- Practice details -->
+      <fieldset class="hg-fieldset">
+        <legend class="hg-legend">Practice details</legend>
+        <div class="hg-grid">
+          <div class="hg-field">
+            <label for="practiceName">Practice name <span class="hg-req">*</span></label>
+            <input id="practiceName" name="practiceName" type="text" autocomplete="organization"
+                   maxlength="120" required aria-describedby="practiceName-error" />
+            <p class="hg-error" id="practiceName-error" role="alert"></p>
+          </div>
+          <div class="hg-field">
+            <label for="practiceLocation">Practice location <span class="hg-req">*</span></label>
+            <input id="practiceLocation" name="practiceLocation" type="text"
+                   autocomplete="address-level2" maxlength="160" required
+                   placeholder="Town / branch, e.g. Bolton — Bradshawgate"
+                   aria-describedby="practiceLocation-error" />
+            <p class="hg-error" id="practiceLocation-error" role="alert"></p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Contact details -->
+      <fieldset class="hg-fieldset">
+        <legend class="hg-legend">Your details</legend>
+        <div class="hg-grid">
+          <div class="hg-field">
+            <label for="contactName">Contact name <span class="hg-req">*</span></label>
+            <input id="contactName" name="contactName" type="text" autocomplete="name"
+                   maxlength="120" required aria-describedby="contactName-error" />
+            <p class="hg-error" id="contactName-error" role="alert"></p>
+          </div>
+          <div class="hg-field">
+            <label for="phone">Phone number <span class="hg-req">*</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"
+                   maxlength="20" required placeholder="e.g. 01204 123456"
+                   aria-describedby="phone-hint phone-error" />
+            <p class="hg-hint" id="phone-hint">A number we can reach you on if we need more detail.</p>
+            <p class="hg-error" id="phone-error" role="alert"></p>
+          </div>
+        </div>
+        <div class="hg-field">
+          <label for="email">Email address <span class="hg-optional">(optional)</span></label>
+          <input id="email" name="email" type="email" autocomplete="email" maxlength="254"
+                 placeholder="you@practice.co.uk" aria-describedby="email-hint email-error" />
+          <p class="hg-hint" id="email-hint">Add your email and we'll send you a confirmation with your reference number.</p>
+          <p class="hg-error" id="email-error" role="alert"></p>
+        </div>
+      </fieldset>
+
+      <!-- The issue -->
+      <fieldset class="hg-fieldset">
+        <legend class="hg-legend">The issue</legend>
+        <div class="hg-field">
+          <label for="problemDescription">Problem description <span class="hg-req">*</span></label>
+          <textarea id="problemDescription" name="problemDescription" rows="5" maxlength="4000"
+                    required aria-describedby="problemDescription-hint problemDescription-error"
+                    placeholder="Describe the issue clearly, including error messages, affected devices, and when the problem started."></textarea>
+          <div class="hg-textarea-meta">
+            <p class="hg-hint" id="problemDescription-hint">A brief but accurate explanation helps us fix it faster.</p>
+            <span class="hg-counter" id="problemDescription-counter" aria-hidden="true">0 / 4000</span>
+          </div>
+          <p class="hg-error" id="problemDescription-error" role="alert"></p>
+        </div>
+      </fieldset>
+
+      <!-- Urgency -->
+      <fieldset class="hg-fieldset">
+        <legend class="hg-legend">How urgent is it? <span class="hg-req">*</span></legend>
+        <div class="hg-choices" role="radiogroup" aria-describedby="urgency-error">
+          <label class="hg-choice hg-choice--urgent">
+            <input type="radio" name="urgency" value="emergency" required />
+            <span class="hg-choice-body">
+              <span class="hg-choice-head">
+                <span class="hg-choice-badge hg-choice-badge--urgent">Emergency</span>
+                <span class="hg-choice-title">Emergency / Urgent</span>
+              </span>
+              <span class="hg-choice-desc">
+                The issue needs immediate attention — e.g. systems down, can't see
+                patients, or no access to clinical software. We'll alert the IT
+                team right away.
+              </span>
+            </span>
+          </label>
+
+          <label class="hg-choice hg-choice--normal">
+            <input type="radio" name="urgency" value="next-business-day" required />
+            <span class="hg-choice-body">
+              <span class="hg-choice-head">
+                <span class="hg-choice-badge hg-choice-badge--normal">Standard</span>
+                <span class="hg-choice-title">Can wait until next business day</span>
+              </span>
+              <span class="hg-choice-desc">
+                Non-critical — you can keep working for now. It'll be picked up
+                from the standard support queue on the next business day.
+              </span>
+            </span>
+          </label>
+        </div>
+        <p class="hg-error" id="urgency-error" role="alert"></p>
+      </fieldset>
+
+      <!-- Human verification -->
+      <fieldset class="hg-fieldset">
+        <legend class="hg-legend">Quick check</legend>
+        <div class="hg-field" id="captcha-builtin">
+          <label for="captchaAnswer">
+            Are you human? <span id="captcha-question" class="hg-captcha-q">Loading…</span>
+            <span class="hg-req">*</span>
+          </label>
+          <div class="hg-captcha-row">
+            <input id="captchaAnswer" name="captchaAnswer" type="text" inputmode="numeric"
+                   autocomplete="off" maxlength="6" class="hg-captcha-input"
+                   aria-describedby="captcha-error" />
+            <button type="button" id="captcha-refresh" class="hg-btn-ghost"
+                    aria-label="Get a new question">New question</button>
+          </div>
+          <p class="hg-error" id="captcha-error" role="alert"></p>
+        </div>
+        <!-- Third-party widget mounts here when configured (Turnstile/reCAPTCHA/hCaptcha). -->
+        <div id="captcha-widget" hidden></div>
+      </fieldset>
+
+      <!-- Honeypot: hidden from humans, tempting to bots. Must stay empty. -->
+      <div class="hg-hp" aria-hidden="true">
+        <label for="website">Website</label>
+        <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" id="formLoadedAt" name="formLoadedAt" value="" />
+
+      <p class="hg-form-status" id="form-status" role="alert" aria-live="assertive"></p>
+
+      <div class="hg-actions">
+        <button type="submit" id="submit-btn" class="hg-btn-primary">
+          <span class="hg-btn-label">Submit request</span>
+          <span class="hg-spinner" aria-hidden="true"></span>
+        </button>
+        <p class="hg-privacy">
+          We use your details only to resolve your IT request. Protected by spam
+          filtering and verification.
+        </p>
+      </div>
+    </form>
+
+    <!-- ───────────────────────── Success panel ───────────────────────── -->
+    <section id="success-panel" class="hg-card hg-success" hidden aria-live="polite" tabindex="-1">
+      <div class="hg-success-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </div>
+      <h2 id="success-title">Request received</h2>
+      <p id="success-message"></p>
+      <dl class="hg-success-meta">
+        <div>
+          <dt>Reference</dt>
+          <dd id="success-ref">—</dd>
+        </div>
+        <div>
+          <dt>Priority</dt>
+          <dd><span id="success-priority" class="hg-badge">—</span></dd>
+        </div>
+      </dl>
+      <p class="hg-success-next" id="success-next"></p>
+      <button type="button" id="another-btn" class="hg-btn-secondary">Log another request</button>
+    </section>
+  </main>
+
+  <footer class="hg-footer">
+    <div class="hg-container">
+      <p>
+        Hakim Group IT Support · For urgent issues outside this form, email
+        <a id="footer-email" href="#">it.support@hakimgroup.co.uk</a>.
+      </p>
+      <p class="hg-footer-fine">This portal is for internal practice use only.</p>
+    </div>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

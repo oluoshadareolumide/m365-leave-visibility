@@ -19,6 +19,10 @@ before you hit send whether a recipient is away.
 - 🔐 **SSO** — single sign-on via Microsoft Entra ID (Azure AD); no separate login.
 - 🧪 **Dev mode** — run the whole thing locally with mock data, no Azure or iTrent
   required (see [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md)).
+- 🎫 **IT Support Portal** — a bundled, responsive intake form for practice staff
+  to log IT issues. Urgent tickets are emailed to IT and raised in Microsoft
+  Teams; routine ones go to the standard queue (see
+  [`docs/SUPPORT_PORTAL.md`](docs/SUPPORT_PORTAL.md)).
 
 ## Architecture
 
@@ -36,6 +40,22 @@ Outlook ──▶ Add-in task pane (src/) ──▶ Backend API (server/) ──
                           iTrent HR ──▶ sync service / Azure Function
 ```
 
+## IT Support Portal
+
+A bundled, public-facing intake form ([`support-portal/`](support-portal/))
+served by the same backend. Practice staff log an IT issue and pick its urgency;
+the API validates + de-spams the submission, stores it, and routes it:
+
+- **Emergency / Urgent** → high-priority email to `it.support@hakimgroup.co.uk`
+  **and** a Microsoft Teams alert.
+- **Can wait until next business day** → standard support queue, normal priority.
+
+Responsive, accessible, CAPTCHA-protected, and confirmation-emails the requester.
+Run it locally with `DEV_MODE=true npm run dev:server` then open
+<http://localhost:3001/>. Full guide: [`docs/SUPPORT_PORTAL.md`](docs/SUPPORT_PORTAL.md).
+
+![IT Support Portal](docs/screenshots/portal-desktop.png)
+
 ## Project structure
 
 ```
@@ -44,12 +64,15 @@ src/
   commands/        Event-based command handlers
   shared/          Auth config, constants, shared types
 server/
-  src/routes/      auth · leave · sync
-  src/services/    graphService · itrentService · leaveStatusService · syncService · notificationService
-  src/data/        leaveCache · mockData
+  src/routes/      auth · leave · sync · tickets
+  src/services/    graphService · itrentService · leaveStatusService · syncService ·
+                   notificationService · ticketService · ticketValidation ·
+                   captchaService · teamsWebhookService · supportEmailService
+  src/data/        leaveCache · ticketStore · mockData
   azure-function-sync/  Timer-triggered iTrent sync
+support-portal/    Static IT Support Portal frontend (HTML/CSS/JS, served by the API)
 deploy/            Azure deployment script
-docs/              Local testing guide
+docs/              Local testing guide · IT Support Portal guide
 ```
 
 ## Prerequisites

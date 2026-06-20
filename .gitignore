@@ -20,3 +20,6 @@ server/azure-function-sync/node_modules/
 *.crt
 *.key
 certs/
+# Support portal: locally-stored ticket submissions (file backend)
+server/data/
+tickets.jsonl

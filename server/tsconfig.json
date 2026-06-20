@@ -16,5 +16,11 @@
     "noUnusedParameters": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "azure-function-sync"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "azure-function-sync",
+    "**/__tests__/**",
+    "**/*.test.ts"
+  ]
 }
